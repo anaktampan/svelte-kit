@@ -19,7 +19,8 @@ import {
 	Emulator,
 	Adapter,
 	ServerInit,
-	ClientInit
+	ClientInit,
+	Transporter
 } from '@sveltejs/kit';
 import {
 	HttpMethod,
@@ -68,7 +69,7 @@ export interface BuildData {
 	service_worker: string | null;
 	client: {
 		start: string;
-		app: string;
+		app?: string;
 		imports: string[];
 		stylesheets: string[];
 		fonts: string[];
@@ -111,12 +112,14 @@ export interface ServerHooks {
 	handle: Handle;
 	handleError: HandleServerError;
 	reroute: Reroute;
+	transport: Record<string, Transporter>;
 	init?: ServerInit;
 }
 
 export interface ClientHooks {
 	handleError: HandleClientError;
 	reroute: Reroute;
+	transport: Record<string, Transporter>;
 	init?: ClientInit;
 }
 
@@ -303,7 +306,10 @@ export interface ServerMetadata {
 
 export interface SSRComponent {
 	default: {
-		render(props: Record<string, any>): {
+		render(
+			props: Record<string, any>,
+			opts: { context: Map<any, any> }
+		): {
 			html: string;
 			head: string;
 			css: {
